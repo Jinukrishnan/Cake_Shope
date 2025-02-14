@@ -7,7 +7,7 @@ const router=Router();
 // router.route("/sendotp").post(urh.sendOTP);
 // admin
 router.route("/adminregister").post(arh.adminRegister)
-
+router.route("/adminlogin").post(arh.adminLogin)
 // products
 router.route("/addproduct").post(prh.addProduct);
 router.route("/getproducts").get(prh.getProducts);

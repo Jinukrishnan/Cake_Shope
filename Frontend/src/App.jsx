@@ -4,6 +4,8 @@ import Login from './Login'
 import Index from './Index'
 import Cart from './Cart'
 import LargeScreenPage from './LargeScreenPage'
+import AdminLogin from './Admin/AdminLogin'
+import ForgetPWD from './Admin/ForgetPWD/ForgetPWD'
 const App = () => {
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth > 768);
 
@@ -23,6 +25,8 @@ const App = () => {
         <Route path='/' Component={Index}/>
         <Route path='/login' Component={Login}/>
         <Route path='/cart' Component={Cart}/>
+        <Route path='/adminlogin' Component={AdminLogin}/>
+        <Route path='/forgetpassword' Component={ForgetPWD}/>
       </Routes>
       </BrowserRouter>
      }

@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import axios from "axios"
+import apiIntegration from './ApiIntegration'
+import { Link } from 'react-router-dom'
 const Index = () => {
 	const [search, setSearch] = useState("")
 	const [list, setList] = useState([])
 	const [products, setProducts] = useState([])
-	let [count,setCount]=useState(0)
+	let [count, setCount] = useState(0)
+	const [totalQuantity, setTotalQuantity] = useState(0)
 	useEffect(() => {
 		jQuery("document").ready(function ($) {
 
@@ -17,38 +20,79 @@ const Index = () => {
 		getProducts();
 	}, [count])
 
+	// get products
 	const getProducts = async () => {
 		try {
-			const res = await axios.get("http://localhost:3000/api/getproducts");
-			if (res.status == 200) {
+
+
+			const res = await axios.get(`${apiIntegration()}/api/getproducts`);
+			// console.log(res.data.products);
+			if(res.status==200){
 				setProducts([...res.data.products])
+				const qty=res.data.products.reduce((total,item)=>total+item?.quantity,0)
+				setTotalQuantity(qty)
+
 			}
+			
 
 		} catch (error) {
 			console.log(error);
 
 		}
 	}
+
 	const handleChange = (e) => {
 		console.log(e.target.value);
 
 		setSearch(e.target.value)
 		e.target.value ? setList([...products.filter((product) => product.name.toLowerCase().includes(e.target.value.toLowerCase()))]) : setList([])
 	}
+
 	const handleSearch = () => {
 		setProducts([...products.filter((product => product.name.toLowerCase().includes(search.toLowerCase())))])
 	}
+
 	const listSort = (name) => {
 		setProducts([...products.filter((product => product.name.toLowerCase().includes(name.toLowerCase())))])
 		setList([])
 
 
 	}
+	// add to cart
+
+	const addToCart = async (productId) => {
+
+		console.log(productId);
+		try {
+
+			const res = await axios.post(`${apiIntegration()}/api/addtocart`, { productId })
+			console.log(res.data);
+			setCount(count + 1)
+		} catch (error) {
+			console.log(error.response.data.msg);
 
 
-	console.log(list);
+		}
+	}
 
+	// remove from cart
 
+	const removeFromCart = async (productId) => {
+
+		console.log(productId);
+		try {
+
+			const res = await axios.post(`${apiIntegration()}/api/removefromcart`, { productId })
+			console.log(res.data);
+			setCount(count + 1)
+
+		} catch (error) {
+			console.log(error.response.data.msg);
+
+		}
+	}
+	console.log(totalQuantity);
+	
 	return (
 		<div>
 
@@ -58,8 +102,8 @@ const Index = () => {
 						<div className="col-lg-5">
 							<div className="header-wrapper-div">
 								<div className="search-wrapper">
-									<button className="backbtn" onClick={() => setCount(count+=1)}><i className="fa-solid fa-angle-left"></i></button>
-									<input type="text" placeholder="Search" onChange={handleChange} />
+									<button className="backbtn" onClick={() =>{ setCount(count+=1);setSearch("")}}><i className="fa-solid fa-angle-left"></i></button>
+									<input type="text" placeholder="Search" onChange={handleChange} value={search}/>
 									<button className="searchbtn" onClick={handleSearch}><i className="fa-solid fa-magnifying-glass"></i></button>
 									{
 										list.length != 0 && <div className='border mt-2 p-2 rounded shadow max-h-40 ' style={{ minHeight: "auto", maxHeight: "200px", overflowY: "scroll" }}>
@@ -133,16 +177,16 @@ const Index = () => {
 										<div className="contents-item-div vegicon" key={index}>
 											<div className="item-image-div"><img src="img/redvelvet-cheese-cake.png" alt="Red Velvet Cheese Cake" /></div>
 											<div className="contentsholder-item">
-												<h5>{product.name}</h5>
-												<h4><i className="fa-solid fa-indian-rupee-sign"></i> {product.price}</h4>
+												<h5>{product?.name}</h5>
+												<h4><i className="fa-solid fa-indian-rupee-sign"></i> {product?.price}</h4>
 												<h6><i className="fa-solid fa-star"></i> <b>4.4</b> (1432)</h6>
 											</div>
 
 											<div className="quality-buttons">
 												<span>
-													<button className="minus-btn"><i className="fa-solid fa-minus"></i></button>
-													<input type="text" />
-													<button className="plus-btn"><i className="fa-solid fa-plus"></i></button>
+													<button className="minus-btn" onClick={() => removeFromCart(`${product._id}`)} ><i className="fa-solid fa-minus"></i></button>
+													<input type="text" value={product?.quantity} />
+													<button className="plus-btn" onClick={() => addToCart(`${product._id}`)}><i className="fa-solid fa-plus"></i></button>
 												</span>
 											</div>
 										</div>
@@ -321,7 +365,7 @@ const Index = () => {
 			</section>
 
 
-			<button className="checkout-button"><span>5</span><i className="fa-solid fa-cart-shopping"></i></button>
+			<Link to={"/cart"}><button className="checkout-button" ><span>{totalQuantity != 0 && totalQuantity}</span><i className="fa-solid fa-cart-shopping"></i></button></Link>
 
 		</div>
 	)

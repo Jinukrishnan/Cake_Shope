@@ -14,6 +14,8 @@ router.route("/adminhome").get(Auth,arh.adminHome)
 // restaurant
 router.route("/addrestaurant").post(arh.addRestaurant)
 router.route("/listrestaurants").get(arh.listRestaurants)
+router.route("/updaterestaurant/:_id").put(arh.updateRestaurant)
+router.route("/deleterestaurant/:_id").delete(arh.deleteRestaurant)
 
 // products
 router.route("/addproduct").post(prh.addProduct);

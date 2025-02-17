@@ -159,3 +159,31 @@ try {
     res.status(400).send({error})
 }
 }
+
+exports.updateRestaurant=async(req,res)=>{
+    try {
+        console.log(req.params);
+        const {_id}=req.params;
+    const {name,email,phone}=req.body;
+    if (!(name && phone && email))
+        return res.status(400).json({ msg: "fields are empty" });
+    const data=await restaurantSchema.updateOne({_id},{$set:{name,email,phone}});
+    res.status(201).json({msg:"updated Successfully"})
+} catch (error) {
+    res.status(400).send({error})
+}
+
+
+}
+exports.deleteRestaurant=async(req,res)=>{
+    try {
+        const {_id}=req.params
+        await restaurantSchema.deleteOne({_id});
+        res.status(200).json({msg:"deleted Successfully"})
+
+    } catch (error) {
+        res.status(400).send({error})
+        
+    }
+    
+}
